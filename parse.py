@@ -1,4 +1,6 @@
 import feedparser
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
 
 query = 'Russia'
 
@@ -16,7 +18,6 @@ def parse_data(query = query):
         for word in words_in_title:
             separate_words.append(word)
     return separate_words
-# separate_words = set(separate_words)
 
 def get_top_50(separate_words):
     for word in separate_words:
@@ -31,10 +32,33 @@ def get_top_50(separate_words):
     sorted_dict = dict(sorted(dict_of_words.items(), key = lambda item: item[1], reverse = True))
     sorted_dict_items = sorted_dict.items()
     top_50 = dict(list(sorted_dict_items)[:50])
-    # print(len(separate_words))
-    # print(separate_words)
     print(top_50)
     return top_50
 
+def top50_dict_to_str(top_50):
+    top_50 = list(top_50)
+    top50_str = ''
+    for word in top_50:
+        top50_str += word + " "
+    return top50_str
+
+def plot_cloud(wordcloud):
+    plt.figure(figsize=(40, 30))
+    plt.imshow(wordcloud)
+    plt.axis("off")
+
+
+
 list_of_words = parse_data()
-get_top_50(list_of_words)
+top50 = get_top_50(list_of_words)
+top50_str = top50_dict_to_str(top50)
+
+wordcloud = WordCloud ( width= 3000, 
+                        height= 2000, 
+                        random_state=1, 
+                        background_color='black', 
+                        colormap='Set2', 
+                        collocations=False, 
+                        stopwords=STOPWORDS).generate(top50_str)
+plot_cloud(wordcloud)
+wordcloud.to_file("wordcloud.png")
